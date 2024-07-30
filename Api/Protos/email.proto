@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option csharp_namespace = "ApiGateway.Protos";
+
+import "google/api/annotations.proto";
+import "google/api/http.proto";
+
+package email;
+
+service EmailServiceProto {
+    rpc SendEmail (SendEmailRequest) returns (SendEmailResponse){
+        option (google.api.http) = {
+            post: "/v1/emails"
+            body: "*"
+        };
+    };
+}
+
+message SendEmailRequest {
+    string to_email = 1;
+    string to_name = 2;
+    string subject = 3;
+    string body = 4;
+}
+
+message SendEmailResponse {
+    bool success = 1;
+}

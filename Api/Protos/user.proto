@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+option csharp_namespace = "ApiGateway.Protos";
+
+import "google/api/annotations.proto";
+import "google/api/http.proto";
+
+service UserServiceProto {
+    rpc RegisterUser (RegisterUserRequest) returns (RegisterUserResponse){
+        option (google.api.http) = {
+              post: "/api/v1/users"
+          };
+    };
+    rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse){
+         option (google.api.http) = {
+            patch: "/v1/users/{user_id}"
+            body: "role"
+        };
+    };
+}
+
+message RegisterUserRequest {
+    string username = 1;
+    string email = 2;
+    string first_name = 3;
+    string last_name = 4;
+    string role = 5;
+}
+
+message RegisterUserResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message UpdateUserRequest {
+    string user_id = 1;
+    string role = 2;
+}
+
+message UpdateUserResponse {
+    bool success = 1;
+}
