@@ -1,47 +1,29 @@
-﻿using EmailService;  
-using Grpc.Core;
-using MimeKit;
-using EmailService.Proto;
-using MailKit.Net.Smtp;
+﻿using FluentEmail.Core;
+using System.Threading.Tasks;
 
 namespace EmailService.Services
 {
-    public class EmailServiceImpl : EmailServiceProto.EmailServiceProtoBase, IEmailService
+    public class EmailServiceImpl : IEmailService
     {
-        private readonly SmtpClient _smtpClient;
+        private readonly IFluentEmail _fluentEmail;
 
-        public EmailServiceImpl()
+        public EmailServiceImpl(IFluentEmail fluentEmail)
         {
-            _smtpClient = new SmtpClient();
-            _smtpClient.Connect("smtp.yourserver.com", 587, false);
-            _smtpClient.Authenticate("yourusername", "yourpassword");
+            _fluentEmail = fluentEmail;
         }
 
-        public async Task SendEmailAsync(MimeMessage message)
+        public async Task SendEmailAsync(string toEmail, string toName, string subject, string body)
         {
-            await _smtpClient.SendAsync(message);
-            await _smtpClient.DisconnectAsync(true);
-        }
+            var response = await _fluentEmail
+                .To(toEmail)
+                .Subject(subject)
+                .Body(body)
+                .SendAsync();
 
-        public override async Task<SendEmailResponse> SendEmail(SendEmailRequest request, ServerCallContext context)
-        {
-            var emailMessage = new MimeMessage
+            if (!response.Successful)
             {
-                Subject = request.Subject,
-                Body = new TextPart("plain") { Text = request.Body }
-            };
-
-            emailMessage.From.Add(new MailboxAddress("YourApp", "noreply@yourapp.com"));
-            emailMessage.To.Add(new MailboxAddress(request.ToName, request.ToEmail));
-
-            try
-            {
-                await SendEmailAsync(emailMessage);
-                return new SendEmailResponse { Success = true };
-            }
-            catch
-            {
-                return new SendEmailResponse { Success = false };
+                var errorMessages = string.Join(", ", response.ErrorMessages);
+                throw new Exception($"FluentEmail request failed: {errorMessages}");
             }
         }
     }

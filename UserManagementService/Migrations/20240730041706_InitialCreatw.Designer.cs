@@ -10,8 +10,8 @@ using UserManagementService.Data;
 namespace UserManagementService.Migrations
 {
     [DbContext(typeof(UserManagementDbContext))]
-    [Migration("20240725092933_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240730041706_InitialCreatw")]
+    partial class InitialCreatw
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

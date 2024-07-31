@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using Grpc.Core;
-using System.Threading.Tasks;
-using UserManagementService.Data;
 using UserManagementService.Data.Entities;
 using UserManagementService.Data.Exceptions;
 using UserManagementService.Data.Repositories;
@@ -54,8 +52,6 @@ namespace UserManagementService.Services
                 await _userRepository.AddUserAsync(user);
                 await _userRepository.SaveChangesAsync();
 
-                // We are not sending email here, it will be handled by the API Gateway
-
                 return new RegisterUserResponse
                 {
                     Success = true,
@@ -69,11 +65,15 @@ namespace UserManagementService.Services
                     Success = false,
                     Message = ex.Message
                 };
-           
             }
         }
 
         public override async Task<UpdateUserResponse> UpdateUser(UpdateUserRequest request, ServerCallContext context)
+        {
+            return await UpdateUserAsync(request);
+        }
+
+        public async Task<UpdateUserResponse> UpdateUserAsync(UpdateUserRequest request)
         {
             try
             {

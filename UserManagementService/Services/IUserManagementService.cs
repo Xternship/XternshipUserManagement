@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using UserManagementService.Dtos;
+﻿using UserManagementService.Dtos;
 using UserManagementService.Protos;
 
 namespace UserManagementService.Services

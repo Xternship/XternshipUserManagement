@@ -14,6 +14,7 @@ public class MappingsProfile : Profile
             .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
             .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role));
 
+
         // Map UserProfile to ApiResponse if needed
          CreateMap<UserProfile, ApiResponse>()
              .ForMember(dest => dest.Success, opt => opt.MapFrom(src => true))
