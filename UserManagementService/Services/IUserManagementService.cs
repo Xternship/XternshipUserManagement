@@ -6,7 +6,6 @@ namespace UserManagementService.Services
 {
     public interface IUserManagementService
     {
-        Task<RegisterUserResponse> RegisterUserAsync(UserDto userDto);
         Task<UpdateUserResponse> UpdateUserAsync(UpdateUserRequest request);
     }
 }

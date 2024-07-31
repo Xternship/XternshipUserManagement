@@ -23,11 +23,6 @@ namespace UserManagementService.Data.Repositories
             return await _context.Users.FindAsync(id);
         }
 
-        public async Task AddUserAsync(User user)
-        {
-            await _context.Users.AddAsync(user);
-        }
-
         public async Task UpdateUserAsync(User user)
         {
             _context.Users.Update(user);

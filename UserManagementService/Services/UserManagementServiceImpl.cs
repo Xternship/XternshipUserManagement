@@ -21,58 +21,7 @@ namespace UserManagementService.Services
             _mapper = mapper;
         }
 
-        public override async Task<RegisterUserResponse> RegisterUser(RegisterUserRequest request, ServerCallContext context)
-        {
-            var userDto = new UserDto
-            {
-                Username = request.Username,
-                Email = request.Email,
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                Role = request.Role
-            };
-
-            return await RegisterUserAsync(userDto);
-        }
-
-        public async Task<RegisterUserResponse> RegisterUserAsync(UserDto userDto)
-        {
-            var user = _mapper.Map<User>(userDto);
-
-            try
-            {
-                var existingUser = await _userRepository.GetUserByUsernameAsync(user.Username);
-                if (existingUser != null)
-                {
-                    return new RegisterUserResponse
-                    {
-                        Success = false,
-                        Message = "User already exists"
-                    };
-                }
-
-                await _userRepository.AddUserAsync(user);
-                await _userRepository.SaveChangesAsync();
-
-                // We are not sending email here, it will be handled by the API Gateway
-
-                return new RegisterUserResponse
-                {
-                    Success = true,
-                    Message = "User registered successfully"
-                };
-            }
-            catch (UserNotFoundException ex)
-            {
-                return new RegisterUserResponse
-                {
-                    Success = false,
-                    Message = ex.Message
-                };
-           
-            }
-        }
-
+        
         public override async Task<UpdateUserResponse> UpdateUser(UpdateUserRequest request, ServerCallContext context)
         {
             try

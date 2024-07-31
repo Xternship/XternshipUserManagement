@@ -1,47 +1,50 @@
-﻿using EmailService;  
-using Grpc.Core;
-using MimeKit;
+﻿using Grpc.Core;
+using FluentEmail.Core;
 using EmailService.Proto;
-using MailKit.Net.Smtp;
+using Microsoft.Extensions.Logging;
 
 namespace EmailService.Services
 {
     public class EmailServiceImpl : EmailServiceProto.EmailServiceProtoBase, IEmailService
     {
-        private readonly SmtpClient _smtpClient;
+        private readonly IFluentEmail _fluentEmail;
+        private readonly ILogger<EmailServiceImpl> _logger;
 
-        public EmailServiceImpl()
+        public EmailServiceImpl(IFluentEmail fluentEmail, ILogger<EmailServiceImpl> logger)
         {
-            _smtpClient = new SmtpClient();
-            _smtpClient.Connect("smtp.yourserver.com", 587, false);
-            _smtpClient.Authenticate("yourusername", "yourpassword");
-        }
-
-        public async Task SendEmailAsync(MimeMessage message)
-        {
-            await _smtpClient.SendAsync(message);
-            await _smtpClient.DisconnectAsync(true);
+            _fluentEmail = fluentEmail;
+            _logger = logger;
         }
 
         public override async Task<SendEmailResponse> SendEmail(SendEmailRequest request, ServerCallContext context)
         {
-            var emailMessage = new MimeMessage
-            {
-                Subject = request.Subject,
-                Body = new TextPart("plain") { Text = request.Body }
-            };
+            return await SendEmailAsync(request, context);
+        }
 
-            emailMessage.From.Add(new MailboxAddress("YourApp", "noreply@yourapp.com"));
-            emailMessage.To.Add(new MailboxAddress(request.ToName, request.ToEmail));
-
+        public async Task<SendEmailResponse> SendEmailAsync(SendEmailRequest request, ServerCallContext context)
+        {
             try
             {
-                await SendEmailAsync(emailMessage);
-                return new SendEmailResponse { Success = true };
+                var response = await _fluentEmail
+                    .To(request.Email)
+                    .Subject("Welcome to Xternship")
+                    .Body($"Hello {request.Username},\n\nYour account has been created. Your password is: {request.Password}")
+                    .SendAsync();
+
+                if (response.Successful)
+                {
+                    return new SendEmailResponse { Message = "Email sent successfully" };
+                }
+                else
+                {
+                    _logger.LogError("Failed to send email.");
+                    return new SendEmailResponse { Message = "Failed to send email" };
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                return new SendEmailResponse { Success = false };
+                _logger.LogError(ex, "Exception occurred while sending email.");
+                return new SendEmailResponse { Message = "Failed to send email" };
             }
         }
     }

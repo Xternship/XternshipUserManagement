@@ -7,7 +7,6 @@ namespace UserManagementService.Data.Repositories
     {
         Task<User> GetUserByUsernameAsync(string username);
         Task<User> GetUserByIdAsync(int id); 
-        Task AddUserAsync(User user);
         Task UpdateUserAsync(User user); 
         Task SaveChangesAsync();
     }

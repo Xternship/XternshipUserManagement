@@ -30,4 +30,9 @@
 		<PackageReference Include="Grpc.AspNetCore.Server.ClientFactory" Version="2.64.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Dtos\" />
+	  <Folder Include="Services\" />
+	</ItemGroup>
+
 </Project>
